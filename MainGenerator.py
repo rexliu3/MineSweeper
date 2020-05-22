@@ -1,13 +1,7 @@
 from random import randint
 
-mainBoard = []
 
-# 20 - 99 / 18 - 40 / 10 - 10
-numRowsColumns = 5
-numMines = 10
-
-
-def print_board(board):
+def print_board(board, numRowsColumns, numMines):
     for i in range(numRowsColumns):
         for j in range(numRowsColumns):
             if j != numRowsColumns - 1:
@@ -16,16 +10,7 @@ def print_board(board):
                 print(str(board[i][j]))
 
 
-def set_up():
-    board = []
-    for i in range(numRowsColumns):
-        board.append([])
-        for j in range(numRowsColumns):
-            board[i].append(0)
-    return board
-
-
-def place_mines(board):
+def place_mines(board, numRowsColumns, numMines):
     for k in range(numMines):
         rowCoordinate = randint(0, numRowsColumns - 1)
         columnCoordinate = randint(0, numRowsColumns - 1)
@@ -68,7 +53,16 @@ def place_mines(board):
     return board
 
 
-def test_generation(board):
+def set_up(board, numRowsColumns, numMines):
+    for i in range(numRowsColumns):
+        board.append([])
+        for j in range(numRowsColumns):
+            board[i].append(0)
+    board = place_mines(board)
+    return board
+
+
+def test_generation(board, numRowsColumns, numMines):
     for test in range(10000):
         for rowCoordinate in range(len(board)):
             for columnCoordinate in range(len(board[0])):
@@ -108,10 +102,3 @@ def test_generation(board):
                     if counter != board[rowCoordinate][columnCoordinate]:
                         return False
     return True
-
-
-mainBoard = set_up()
-sub = place_mines(mainBoard)
-mainBoard = sub
-print_board(mainBoard)
-print(test_generation(mainBoard))
