@@ -268,43 +268,48 @@ def confirmed_safe(board, rowCoordinate, columnCoordinate):
 def hit_zero(board, rowCoordinate, columnCoordinate):
     rows = len(board)
     columns = len(board[0])
+    zeroBoard = []
+    # 0 are setup True
+    # True means haven't been checked / False means checked
     board[rowCoordinate][columnCoordinate] = 0
+    zeroBoard = set_up_checked_board(board, zeroBoard)
+    zeroBoard[rowCoordinate][columnCoordinate] = False
 
     def check_right(board, rowCoordinate, columnCoordinate):
-        board[rowCoordinate][columnCoordinate] = 0
-        i = 1
-        while columnCoordinate + i - 1 != columns - 1 and solvedBoard[rowCoordinate][columnCoordinate + i] == 0:
-            check_right(board, rowCoordinate, columnCoordinate + i)
-            check_up(board, rowCoordinate, columnCoordinate + i)
-            check_down(board, rowCoordinate, columnCoordinate + i)
-            # i += 1
+        if columnCoordinate != columns - 1 and solvedBoard[rowCoordinate][columnCoordinate + 1] == 0 and \
+                zeroBoard[rowCoordinate][columnCoordinate + 1]:
+            board[rowCoordinate][columnCoordinate + 1] = 0
+            zeroBoard[rowCoordinate][columnCoordinate + 1] = False
+            check_right(board, rowCoordinate, columnCoordinate + 1)
+            check_up(board, rowCoordinate, columnCoordinate + 1)
+            check_down(board, rowCoordinate, columnCoordinate + 1)
 
     def check_left(board, rowCoordinate, columnCoordinate):
-        board[rowCoordinate][columnCoordinate] = 0
-        i = 1
-        while columnCoordinate - i + 1 != 0 and solvedBoard[rowCoordinate][columnCoordinate - i] == 0:
-            check_left(board, rowCoordinate, columnCoordinate - i)
-            check_up(board, rowCoordinate, columnCoordinate - i)
-            check_down(board, rowCoordinate, columnCoordinate - i)
-            # i += 1
+        if columnCoordinate != 0 and solvedBoard[rowCoordinate][columnCoordinate - 1] == 0 and zeroBoard[rowCoordinate][
+            columnCoordinate - 1]:
+            board[rowCoordinate][columnCoordinate - 1] = 0
+            zeroBoard[rowCoordinate][columnCoordinate - 1] = False
+            check_left(board, rowCoordinate, columnCoordinate - 1)
+            check_up(board, rowCoordinate, columnCoordinate - 1)
+            check_down(board, rowCoordinate, columnCoordinate - 1)
 
     def check_up(board, rowCoordinate, columnCoordinate):
-        board[rowCoordinate][columnCoordinate] = 0
-        i = 1
-        while rowCoordinate + i - 1 != rows - 1 and solvedBoard[rowCoordinate + i][columnCoordinate] == 0:
-            check_right(board, rowCoordinate + i, columnCoordinate)
-            check_left(board, rowCoordinate + i, columnCoordinate)
-            check_up(board, rowCoordinate + i, columnCoordinate)
-            # i += 1
+        if rowCoordinate != 0 and solvedBoard[rowCoordinate - 1][columnCoordinate] == 0 and \
+                zeroBoard[rowCoordinate - 1][columnCoordinate]:
+            board[rowCoordinate - 1][columnCoordinate] = 0
+            zeroBoard[rowCoordinate - 1][columnCoordinate] = False
+            check_right(board, rowCoordinate - 1, columnCoordinate)
+            check_left(board, rowCoordinate - 1, columnCoordinate)
+            check_up(board, rowCoordinate + 1, columnCoordinate)
 
     def check_down(board, rowCoordinate, columnCoordinate):
-        board[rowCoordinate][columnCoordinate] = 0
-        i = 1
-        while rowCoordinate - i + 1 != 0 and solvedBoard[rowCoordinate - i][columnCoordinate] == 0:
-            check_right(board, rowCoordinate - i, columnCoordinate)
-            check_left(board, rowCoordinate - i, columnCoordinate)
-            check_down(board, rowCoordinate - i, columnCoordinate)
-            # i += 1
+        if rowCoordinate != rows - 1 and solvedBoard[rowCoordinate + 1][columnCoordinate] == 0 and \
+                zeroBoard[rowCoordinate + 1][columnCoordinate]:
+            board[rowCoordinate + 1][columnCoordinate] = 0
+            zeroBoard[rowCoordinate + 1][columnCoordinate] = False
+            check_right(board, rowCoordinate + 1, columnCoordinate)
+            check_left(board, rowCoordinate + 1, columnCoordinate)
+            check_down(board, rowCoordinate - 1, columnCoordinate)
 
     check_right(board, rowCoordinate, columnCoordinate)
     check_left(board, rowCoordinate, columnCoordinate)
@@ -360,8 +365,7 @@ def board_is_solved(board):
 
 
 def solve_board(board, checked):
-    while not board_is_solved(board):
-        row, column = get_first_edge(board)
+    def solver_func(board, checked, row, column):
         if confirm_mine(board, row, column):
             confirmed_mine(board, row, column)
         if confirm_safe(board, row, column):
@@ -370,16 +374,13 @@ def solve_board(board, checked):
             print("wrong")
             return
         checked[row][column] = True
+
+    while not board_is_solved(board):
+        row, column = get_first_edge(board)
+        solver_func(board, checked, row, column)
         while next_edge(board, checked, row, column):
             row, column = next_edge(board, checked, row, column)
-            if confirm_mine(board, row, column):
-                confirmed_mine(board, row, column)
-            if confirm_safe(board, row, column):
-                confirmed_safe(board, row, column)
-            if not clicked_check(board):
-                print("wrong")
-                return
-            checked[row][column] = True
+            solver_func(board, checked, row, column)
         checked = reset_checked_board(board, checked)
     print("Solved!")
 
