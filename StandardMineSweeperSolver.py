@@ -40,6 +40,7 @@ def set_up_checked_board(board, checked):
 
 
 def checking_func(board, rowCoordinate, columnCoordinate):
+    # Returns False if function is edge
     rows = len(board)
     columns = len(board[0])
     if rowCoordinate != 0 and columnCoordinate != 0:
@@ -89,7 +90,8 @@ def reset_checked_board(board, checked):
 def get_first_edge(board):
     for i in range(len(board)):
         for j in range(len(board[0])):
-            if board[i][j] != 0 and board[i][j] != 9:
+            # if board[i][j] != 0 and board[i][j] != 9 and board[i][j] != -1 and not checking_func(board, i, j):
+            if board[i][j] != 9 and board[i][j] != -1 and not checking_func(board, i, j):
                 return i, j
     return False
 
@@ -276,8 +278,8 @@ def hit_zero(board, rowCoordinate, columnCoordinate):
     zeroBoard[rowCoordinate][columnCoordinate] = False
 
     def check_right(board, rowCoordinate, columnCoordinate):
-        if columnCoordinate != columns - 1 and solvedBoard[rowCoordinate][columnCoordinate + 1] == 0 and \
-                zeroBoard[rowCoordinate][columnCoordinate + 1]:
+        if columnCoordinate != columns - 1 and solvedBoard[rowCoordinate][
+            columnCoordinate + 1] == 0 and zeroBoard[rowCoordinate][columnCoordinate + 1]:
             board[rowCoordinate][columnCoordinate + 1] = 0
             zeroBoard[rowCoordinate][columnCoordinate + 1] = False
             check_right(board, rowCoordinate, columnCoordinate + 1)
@@ -335,22 +337,22 @@ def next_edge(board, checked, rowCoordinate, columnCoordinate):
     columns = len(board[0])
 
     if rowCoordinate != 0:
-        if board[rowCoordinate - 1][columnCoordinate] > 0:
+        if board[rowCoordinate - 1][columnCoordinate] >= 0:
             if not checked[rowCoordinate - 1][columnCoordinate]:
                 return rowCoordinate - 1, columnCoordinate
 
     if columnCoordinate != columns - 1:
-        if board[rowCoordinate][columnCoordinate + 1] > 0:
+        if board[rowCoordinate][columnCoordinate + 1] >= 0:
             if not checked[rowCoordinate][columnCoordinate + 1]:
                 return rowCoordinate, columnCoordinate + 1
 
     if rowCoordinate != rows - 1:
-        if board[rowCoordinate + 1][columnCoordinate] > 0:
+        if board[rowCoordinate + 1][columnCoordinate] >= 0:
             if not checked[rowCoordinate + 1][columnCoordinate]:
                 return rowCoordinate + 1, columnCoordinate
 
     if columnCoordinate != 0:
-        if board[rowCoordinate][columnCoordinate - 1] > 0:
+        if board[rowCoordinate][columnCoordinate - 1] >= 0:
             if not checked[rowCoordinate][columnCoordinate - 1]:
                 return rowCoordinate, columnCoordinate - 1
     return False
@@ -371,7 +373,6 @@ def solve_board(board, checked):
         if confirm_safe(board, row, column):
             confirmed_safe(board, row, column)
         if not clicked_check(board):
-            print("wrong")
             return
         checked[row][column] = True
 
@@ -384,13 +385,7 @@ def solve_board(board, checked):
         checked = reset_checked_board(board, checked)
     print("Solved!")
 
-
 # Main Board already set-up
-
 checkedBoard = set_up_checked_board(mainBoard, checkedBoard)
 solve_board(mainBoard, checkedBoard)
-print("reached end")
-
-'''print_board(mainBoard)
-print(test_generation((solvedBoard)))
-print_board(solvedBoard)'''
+print("Reached End")
