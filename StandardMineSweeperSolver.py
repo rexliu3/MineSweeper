@@ -3,6 +3,8 @@
 # -5 Selected
 # -1 Mine
 
+from StandardMineSweeperGenerator import set_up
+
 mainBoard = [
     [0, 0, 0, 1, 9, 9, 9, 9, 9, 9],
     [0, 0, 0, 1, 9, 9, 9, 9, 9, 9],
@@ -26,6 +28,17 @@ solvedBoard = [
 ]
 
 checkedBoard = []
+
+
+def set_up_mainboard_generated():
+    board = []
+    board = set_up(board, 10, 8, 10)
+    for i in range(len(board)):
+        for j in range(len(board[0])):
+            if board[i][j] == 0:
+                hit_zero(board, i, j)
+                return board
+    return []
 
 
 def set_up_checked_board(board, checked):
@@ -386,6 +399,7 @@ def solve_board(board, checked):
     print("Solved!")
 
 # Main Board already set-up
+mainBoard = set_up_mainboard_generated()
 checkedBoard = set_up_checked_board(mainBoard, checkedBoard)
 solve_board(mainBoard, checkedBoard)
 print("Reached End")
