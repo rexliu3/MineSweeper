@@ -1,6 +1,5 @@
 from random import randint
 
-
 def print_board(board, numRowsColumns, numMines):
     for i in range(numRowsColumns):
         for j in range(numRowsColumns):
@@ -53,10 +52,10 @@ def place_mines(board, numRowsColumns, numMines):
     return board
 
 
-def set_up(board, numRowsColumns, numMines):
-    for i in range(numRowsColumns):
+def set_up(board, numRows, numColumns, numMines):
+    for i in range(numRows):
         board.append([])
-        for j in range(numRowsColumns):
+        for j in range(numColumns):
             board[i].append(0)
     board = place_mines(board)
     return board
