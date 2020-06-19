@@ -1,5 +1,6 @@
 from random import randint
 
+
 def print_board(board, numRowsColumns, numMines):
     for i in range(numRowsColumns):
         for j in range(numRowsColumns):

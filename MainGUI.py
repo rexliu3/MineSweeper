@@ -1,3 +1,8 @@
+# 0-8 Num of Mines
+# 9 Unrevealed
+# -5 Selected
+# -1 Mine
+
 import pygame
 import time
 from MainGenerator import set_up
@@ -18,33 +23,43 @@ mainLinesColor = (213, 166, 169)
 timeColor = (179, 120, 123)
 wrongCounterColor = (247, 126, 133)
 
-def set_up_user_board(emptyBoard, rows, columns):
-    for i in range(rows):
-        emptyBoard.append([])
-        for j in range(columns):
-            emptyBoard[i].append(9)
-    return emptyBoard
 
 class Grid:
     true_board = []
     true_board = set_up(true_board, rowsNum, columnsNum, minesNum)
 
-    user_board = []
-    user_board = set_up_user_board(user_board, rowsNum, columnsNum)
+    user_board = [[9 for j in range(columnsNum)] for i in range(rowsNum)]
 
     def __init__(self, rows, columns, width, height):
         self.rows = rows
         self.columns = columns
         self.width = width
         self.height = height
-        self.model = None
         self.boxes = [[Box(self.user_board[i][j], i, j, width, height) for j in range(columns)] for i in range(rows)]
+        self.model = self.user_board
+        self.selected = None
 
     def update_model(self):
         self.model = [[self.boxes[i][j].value for j in range(self.columns)] for i in range(self.rows)]
 
+    def reveal(self):
+        row, column = self.selected
+        self.boxes[row][column].set_value(self.true_board[row][column])
+        self.update_model()
+
+        if self.boxes[row][column] != -1:
+            return True
+        else:
+            return False
+
     def select(self, row, column, window):
-        pass
+        # Deselect all cubes
+        for i in range(self.rows):
+            for j in range(self.columns):
+                self.boxes[i][j].selected = False
+
+        self.boxes[row][column].selected = True
+        self.selected = (row, column)
 
     def draw(self, window):
         # Draw Sudoku grid lines
@@ -88,6 +103,7 @@ class Box:
         self.columns = columns
         self.width = width
         self.height = height
+        self.selected = False
 
     def draw(self, window):
         font = pygame.font.SysFont("times new roman", 40)
@@ -132,7 +148,6 @@ def main():
     window = pygame.display.set_mode((540, 600))
     pygame.display.set_caption("MineSweeper Game")
     board = Grid(rowsNum, columnsNum, width, height)
-    key = None
     run = True
     start = time.time()
     while run:
@@ -143,17 +158,24 @@ def main():
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE:
                     board.solve_board_visual()
-                    key = None
             if event.type == pygame.MOUSEBUTTONDOWN:
                 position = pygame.mouse.get_pos()
                 clicked = board.click(position)
                 if clicked:
                     board.select(clicked[0], clicked[1], window)
-                    key = None
+            if event.key == pygame.K_RETURN:
+                i, j = board.selected
+                if not board.reveal():
+                    print("Game over")
+                    run = False
+                if board.completed_board():
+                    print("You Completed Board")
+                    run = False
 
         redraw_window(window, board, play_time)
         pygame.display.update()
         board.update_model()
+
 
 main()
 pygame.quit()

@@ -3,7 +3,7 @@
 # -5 Selected
 # -1 Mine
 
-from StandardMineSweeperGenerator import set_up
+from MainGenerator import set_up
 
 mainBoard = [
     [0, 0, 0, 1, 9, 9, 9, 9, 9, 9],
@@ -280,7 +280,7 @@ def confirmed_safe(board, rowCoordinate, columnCoordinate):
             board[rowCoordinate + 1][columnCoordinate + 1] = -5
 
 
-def hit_zero(board, rowCoordinate, columnCoordinate):
+def hit_zero(board, solvedBoard, rowCoordinate, columnCoordinate):
     rows = len(board)
     columns = len(board[0])
     zeroBoard = []
@@ -332,14 +332,14 @@ def hit_zero(board, rowCoordinate, columnCoordinate):
     check_up(board, rowCoordinate, columnCoordinate)
 
 
-def clicked_check(board):
+def clicked_check(board, solvedBoard):
     for i in range(len(board)):
         for j in range(len(board[0])):
             if board[i][j] == -5:
                 if solvedBoard[i][j] != -1:
                     board[i][j] = solvedBoard[i][j]
                     if solvedBoard[i][j] == 0:
-                        hit_zero(board, i, j)
+                        hit_zero(board, solvedBoard, j)
                 else:
                     return False
     return True
@@ -379,13 +379,13 @@ def board_is_solved(board):
     return True
 
 
-def solve_board(board, checked):
+def solve_board(board, solvedBoard, checked):
     def solver_func(board, checked, row, column):
         if confirm_mine(board, row, column):
             confirmed_mine(board, row, column)
         if confirm_safe(board, row, column):
             confirmed_safe(board, row, column)
-        if not clicked_check(board):
+        if not clicked_check(board, solvedBoard):
             return
         checked[row][column] = True
 
@@ -402,5 +402,5 @@ def solve_board(board, checked):
 # Main Board already set-up
 mainBoard = set_up_mainboard_generated()
 checkedBoard = set_up_checked_board(mainBoard, checkedBoard)
-solve_board(mainBoard, checkedBoard)
+solve_board(mainBoard, solvedBoard, checkedBoard)
 print("Reached End")
