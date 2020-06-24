@@ -10,13 +10,13 @@ def print_board(board, numRowsColumns, numMines):
                 print(str(board[i][j]))
 
 
-def place_mines(board, numRowsColumns, numMines):
+def place_mines(board, numRows, numColumns, numMines):
     for k in range(numMines):
-        rowCoordinate = randint(0, numRowsColumns - 1)
-        columnCoordinate = randint(0, numRowsColumns - 1)
+        rowCoordinate = randint(0, numRows - 1)
+        columnCoordinate = randint(0, numColumns - 1)
         while board[rowCoordinate][columnCoordinate] < 0:
-            rowCoordinate = randint(0, numRowsColumns - 1)
-            columnCoordinate = randint(0, numRowsColumns - 1)
+            rowCoordinate = randint(0, numRows - 1)
+            columnCoordinate = randint(0, numColumns - 1)
         board[rowCoordinate][columnCoordinate] = -1
 
         if rowCoordinate != 0 and columnCoordinate != 0:
@@ -27,7 +27,7 @@ def place_mines(board, numRowsColumns, numMines):
             if board[rowCoordinate - 1][columnCoordinate] >= 0:
                 board[rowCoordinate - 1][columnCoordinate] += 1
 
-        if rowCoordinate != 0 and columnCoordinate != numRowsColumns - 1:
+        if rowCoordinate != 0 and columnCoordinate != numColumns - 1:
             if board[rowCoordinate - 1][columnCoordinate + 1] >= 0:
                 board[rowCoordinate - 1][columnCoordinate + 1] += 1
 
@@ -35,19 +35,19 @@ def place_mines(board, numRowsColumns, numMines):
             if board[rowCoordinate][columnCoordinate - 1] >= 0:
                 board[rowCoordinate][columnCoordinate - 1] += 1
 
-        if columnCoordinate != numRowsColumns - 1:
+        if columnCoordinate != numColumns - 1:
             if board[rowCoordinate][columnCoordinate + 1] >= 0:
                 board[rowCoordinate][columnCoordinate + 1] += 1
 
-        if rowCoordinate != numRowsColumns - 1 and columnCoordinate != 0:
+        if rowCoordinate != numRows - 1 and columnCoordinate != 0:
             if board[rowCoordinate + 1][columnCoordinate - 1] >= 0:
                 board[rowCoordinate + 1][columnCoordinate - 1] += 1
 
-        if rowCoordinate != numRowsColumns - 1:
+        if rowCoordinate != numRows - 1:
             if board[rowCoordinate + 1][columnCoordinate] >= 0:
                 board[rowCoordinate + 1][columnCoordinate] += 1
 
-        if rowCoordinate != numRowsColumns - 1 and columnCoordinate != numRowsColumns - 1:
+        if rowCoordinate != numRows - 1 and columnCoordinate != numColumns - 1:
             if board[rowCoordinate + 1][columnCoordinate + 1] >= 0:
                 board[rowCoordinate + 1][columnCoordinate + 1] += 1
     return board
@@ -58,7 +58,7 @@ def set_up(board, numRows, numColumns, numMines):
         board.append([])
         for j in range(numColumns):
             board[i].append(0)
-    board = place_mines(board)
+    board = place_mines(board, numRows, numColumns, numMines)
     return board
 
 

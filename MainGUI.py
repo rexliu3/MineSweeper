@@ -6,6 +6,7 @@
 import pygame
 import time
 from MainGenerator import set_up
+from MainSolver import set_up_checked_board
 
 pygame.init()
 pygame.font.init()
@@ -43,11 +44,64 @@ class Grid:
         self.model = [[self.boxes[i][j].value for j in range(self.columns)] for i in range(self.rows)]
 
     def reveal(self):
-        row, column = self.selected
-        self.boxes[row][column].set_value(self.true_board[row][column])
+        rowCoordinate, columnCoordinate = self.selected
+        self.boxes[rowCoordinate][columnCoordinate].set_value(self.true_board[rowCoordinate][columnCoordinate])
         self.update_model()
 
-        if self.boxes[row][column] != -1:
+        if self.boxes[rowCoordinate][columnCoordinate].value != -1:
+            if self.boxes[rowCoordinate][columnCoordinate].value == 0:
+                board = self.user_board
+                solvedBoard = self.true_board
+                rows = len(board)
+                columns = len(board[0])
+                zeroBoard = []
+                # 0 are setup True
+                # True means haven't been checked / False means checked
+                board[rowCoordinate][columnCoordinate] = 0
+                zeroBoard = set_up_checked_board(board, zeroBoard)
+                zeroBoard[rowCoordinate][columnCoordinate] = False
+
+                def check_right(board, rowCoordinate, columnCoordinate):
+                    if columnCoordinate != columns - 1 and solvedBoard[rowCoordinate][
+                        columnCoordinate + 1] == 0 and zeroBoard[rowCoordinate][columnCoordinate + 1]:
+                        self.boxes[rowCoordinate][columnCoordinate + 1].set_value(0)
+                        zeroBoard[rowCoordinate][columnCoordinate + 1] = False
+                        check_right(board, rowCoordinate, columnCoordinate + 1)
+                        check_up(board, rowCoordinate, columnCoordinate + 1)
+                        check_down(board, rowCoordinate, columnCoordinate + 1)
+
+                def check_left(board, rowCoordinate, columnCoordinate):
+                    if columnCoordinate != 0 and solvedBoard[rowCoordinate][columnCoordinate - 1] == 0 and \
+                            zeroBoard[rowCoordinate][
+                                columnCoordinate - 1]:
+                        self.boxes[rowCoordinate][columnCoordinate - 1].set_value(0)
+                        zeroBoard[rowCoordinate][columnCoordinate - 1] = False
+                        check_left(board, rowCoordinate, columnCoordinate - 1)
+                        check_up(board, rowCoordinate, columnCoordinate - 1)
+                        check_down(board, rowCoordinate, columnCoordinate - 1)
+
+                def check_up(board, rowCoordinate, columnCoordinate):
+                    if rowCoordinate != 0 and solvedBoard[rowCoordinate - 1][columnCoordinate] == 0 and \
+                            zeroBoard[rowCoordinate - 1][columnCoordinate]:
+                        self.boxes[rowCoordinate - 1][columnCoordinate].set_value(0)
+                        zeroBoard[rowCoordinate - 1][columnCoordinate] = False
+                        check_right(board, rowCoordinate - 1, columnCoordinate)
+                        check_left(board, rowCoordinate - 1, columnCoordinate)
+                        check_up(board, rowCoordinate + 1, columnCoordinate)
+
+                def check_down(board, rowCoordinate, columnCoordinate):
+                    if rowCoordinate != rows - 1 and solvedBoard[rowCoordinate + 1][columnCoordinate] == 0 and \
+                            zeroBoard[rowCoordinate + 1][columnCoordinate]:
+                        self.boxes[rowCoordinate + 1][columnCoordinate].set_value(0)
+                        zeroBoard[rowCoordinate + 1][columnCoordinate] = False
+                        check_right(board, rowCoordinate + 1, columnCoordinate)
+                        check_left(board, rowCoordinate + 1, columnCoordinate)
+                        check_down(board, rowCoordinate - 1, columnCoordinate)
+
+                check_right(board, rowCoordinate, columnCoordinate)
+                check_left(board, rowCoordinate, columnCoordinate)
+                check_down(board, rowCoordinate, columnCoordinate)
+                check_up(board, rowCoordinate, columnCoordinate)
             return True
         else:
             return False
@@ -62,15 +116,15 @@ class Grid:
         self.selected = (row, column)
 
     def draw(self, window):
-        # Draw Sudoku grid lines
-        boxWidth = self.width / 9
+        boxWidth = self.width / columnsNum
         for i in range(self.rows + 1):
-            if i % 3 == 0 and i != 0:
-                thick = 4
-            else:
-                thick = 1
+            thick = 1
             pygame.draw.line(window, mainLinesColor, (0, i * boxWidth), (self.width, i * boxWidth), thick)
+
+        for i in range(self.columns + 1):
+            thick = 1
             pygame.draw.line(window, mainLinesColor, (i * boxWidth, 0), (i * boxWidth, self.width), thick)
+
         # Draw Cubes
         for i in range(self.rows):
             for j in range(self.columns):
@@ -143,12 +197,13 @@ def update(inputBoard, window, time):
 
 
 def main():
-    width = 540
-    height = 540
-    window = pygame.display.set_mode((540, 600))
+    width = columnsNum * 60
+    height = rowsNum * 60
+    window = pygame.display.set_mode((width, height + 20))
     pygame.display.set_caption("MineSweeper Game")
     board = Grid(rowsNum, columnsNum, width, height)
     run = True
+    key = None
     start = time.time()
     while run:
         play_time = round(time.time() - start)
@@ -158,19 +213,19 @@ def main():
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE:
                     board.solve_board_visual()
+                if event.key == pygame.K_RETURN:
+                    i, j = board.selected
+                    if not board.reveal():
+                        print("Game over")
+                        run = False
+                    if board.completed_board():
+                        print("You Win")
+                        run = False
             if event.type == pygame.MOUSEBUTTONDOWN:
                 position = pygame.mouse.get_pos()
                 clicked = board.click(position)
                 if clicked:
                     board.select(clicked[0], clicked[1], window)
-            if event.key == pygame.K_RETURN:
-                i, j = board.selected
-                if not board.reveal():
-                    print("Game over")
-                    run = False
-                if board.completed_board():
-                    print("You Completed Board")
-                    run = False
 
         redraw_window(window, board, play_time)
         pygame.display.update()
