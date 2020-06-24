@@ -69,6 +69,9 @@ class Grid:
                         check_right(board, rowCoordinate, columnCoordinate + 1)
                         check_up(board, rowCoordinate, columnCoordinate + 1)
                         check_down(board, rowCoordinate, columnCoordinate + 1)
+                    elif columnCoordinate != columns - 1:
+                        self.boxes[rowCoordinate][columnCoordinate].set_value(
+                            self.true_board[rowCoordinate][columnCoordinate])
 
                 def check_left(board, rowCoordinate, columnCoordinate):
                     if columnCoordinate != 0 and solvedBoard[rowCoordinate][columnCoordinate - 1] == 0 and \
@@ -79,6 +82,9 @@ class Grid:
                         check_left(board, rowCoordinate, columnCoordinate - 1)
                         check_up(board, rowCoordinate, columnCoordinate - 1)
                         check_down(board, rowCoordinate, columnCoordinate - 1)
+                    elif columnCoordinate != 0:
+                        self.boxes[rowCoordinate][columnCoordinate].set_value(
+                            self.true_board[rowCoordinate][columnCoordinate])
 
                 def check_up(board, rowCoordinate, columnCoordinate):
                     if rowCoordinate != 0 and solvedBoard[rowCoordinate - 1][columnCoordinate] == 0 and \
@@ -88,6 +94,9 @@ class Grid:
                         check_right(board, rowCoordinate - 1, columnCoordinate)
                         check_left(board, rowCoordinate - 1, columnCoordinate)
                         check_up(board, rowCoordinate + 1, columnCoordinate)
+                    elif rowCoordinate != 0:
+                        self.boxes[rowCoordinate][columnCoordinate].set_value(
+                            self.true_board[rowCoordinate][columnCoordinate])
 
                 def check_down(board, rowCoordinate, columnCoordinate):
                     if rowCoordinate != rows - 1 and solvedBoard[rowCoordinate + 1][columnCoordinate] == 0 and \
@@ -97,6 +106,9 @@ class Grid:
                         check_right(board, rowCoordinate + 1, columnCoordinate)
                         check_left(board, rowCoordinate + 1, columnCoordinate)
                         check_down(board, rowCoordinate - 1, columnCoordinate)
+                    elif rowCoordinate != rows - 1:
+                        self.boxes[rowCoordinate][columnCoordinate].set_value(
+                            self.true_board[rowCoordinate][columnCoordinate])
 
                 check_right(board, rowCoordinate, columnCoordinate)
                 check_left(board, rowCoordinate, columnCoordinate)
@@ -117,13 +129,15 @@ class Grid:
 
     def draw(self, window):
         boxWidth = self.width / columnsNum
+        thick = 1
+
+        # Draw Horizontal Lines
         for i in range(self.rows + 1):
-            thick = 1
             pygame.draw.line(window, mainLinesColor, (0, i * boxWidth), (self.width, i * boxWidth), thick)
 
+        # Draw Vertical Lines
         for i in range(self.columns + 1):
-            thick = 1
-            pygame.draw.line(window, mainLinesColor, (i * boxWidth, 0), (i * boxWidth, self.width), thick)
+            pygame.draw.line(window, mainLinesColor, (i * boxWidth, 0), (i * boxWidth, self.height), thick)
 
         # Draw Cubes
         for i in range(self.rows):
@@ -132,9 +146,9 @@ class Grid:
 
     def click(self, position):
         if position[0] < self.width and position[1] < self.height:
-            cubeWidth = self.width / 9
-            x = position[0] // cubeWidth
-            y = position[1] // cubeWidth
+            boxWidth = self.width / columnsNum
+            x = position[0] // boxWidth
+            y = position[1] // boxWidth
             return int(y), int(x)
         else:
             return None
@@ -161,7 +175,7 @@ class Box:
 
     def draw(self, window):
         font = pygame.font.SysFont("times new roman", 40)
-        boxWidth = self.width / 9
+        boxWidth = self.width / columnsNum
         x = self.columns * boxWidth
         y = self.rows * boxWidth
         if not (self.value == 9):
@@ -177,7 +191,7 @@ def redraw_window(window, board, time):
     # Draw time
     font = pygame.font.SysFont("times new roman", 30)
     text = font.render("Time: " + format_time(time), 1, timeColor)
-    window.blit(text, (540 - 170, 560))
+    window.blit(text, (board.width - 170, board.height + 15))
     # Draw grid and board
     board.draw(window)
 
@@ -199,7 +213,7 @@ def update(inputBoard, window, time):
 def main():
     width = columnsNum * 60
     height = rowsNum * 60
-    window = pygame.display.set_mode((width, height + 20))
+    window = pygame.display.set_mode((width, height + 60))
     pygame.display.set_caption("MineSweeper Game")
     board = Grid(rowsNum, columnsNum, width, height)
     run = True
