@@ -118,7 +118,7 @@ class Grid:
                         self.update_model()
                         for i in range(rowsNum):
                             for j in range(columnsNum):
-                                if self.boxes[i][j].value == 0 and not is_edge(board, i, j) and has_zero_edge():
+                                if self.boxes[i][j].value == 0 and not is_edge(board, i, j):
                                     return i, j
 
                     def move_edge_zero(rowCoordinate, columnCoordinate):
