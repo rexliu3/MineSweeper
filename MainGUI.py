@@ -7,6 +7,7 @@ import pygame
 import time
 from MainGenerator import set_up
 from MainSolver import set_up_checked_board
+from MainSolver import checking_func as is_edge
 
 pygame.init()
 pygame.font.init()
@@ -29,15 +30,13 @@ class Grid:
     true_board = []
     true_board = set_up(true_board, rowsNum, columnsNum, minesNum)
 
-    user_board = [[9 for j in range(columnsNum)] for i in range(rowsNum)]
-
     def __init__(self, rows, columns, width, height):
         self.rows = rows
         self.columns = columns
         self.width = width
         self.height = height
-        self.boxes = [[Box(self.user_board[i][j], i, j, width, height) for j in range(columns)] for i in range(rows)]
-        self.model = self.user_board
+        self.boxes = [[Box(9, i, j, width, height) for j in range(columns)] for i in range(rows)]
+        self.model = [[9 for j in range(columns)] for i in range(rows)]
         self.selected = None
 
     def update_model(self):
@@ -50,70 +49,171 @@ class Grid:
 
         if self.boxes[rowCoordinate][columnCoordinate].value != -1:
             if self.boxes[rowCoordinate][columnCoordinate].value == 0:
-                board = self.user_board
+                board = self.model
                 solvedBoard = self.true_board
                 rows = len(board)
                 columns = len(board[0])
                 zeroBoard = []
                 # 0 are setup True
                 # True means haven't been checked / False means checked
-                board[rowCoordinate][columnCoordinate] = 0
+
                 zeroBoard = set_up_checked_board(board, zeroBoard)
                 zeroBoard[rowCoordinate][columnCoordinate] = False
+                if True:
+                    def check_right(board, rowCoordinate, columnCoordinate):
+                        if columnCoordinate != columns - 1 and solvedBoard[rowCoordinate][
+                            columnCoordinate + 1] == 0 and zeroBoard[rowCoordinate][columnCoordinate + 1]:
+                            self.boxes[rowCoordinate][columnCoordinate + 1].set_value(0)
+                            zeroBoard[rowCoordinate][columnCoordinate + 1] = False
+                            check_right(board, rowCoordinate, columnCoordinate + 1)
+                            check_up(board, rowCoordinate, columnCoordinate + 1)
+                            check_down(board, rowCoordinate, columnCoordinate + 1)
+                            '''elif columnCoordinate != columns - 1:
+                            self.boxes[rowCoordinate][columnCoordinate + 1].set_value(
+                                self.true_board[rowCoordinate][columnCoordinate + 1])'''
 
-                def check_right(board, rowCoordinate, columnCoordinate):
-                    if columnCoordinate != columns - 1 and solvedBoard[rowCoordinate][
-                        columnCoordinate + 1] == 0 and zeroBoard[rowCoordinate][columnCoordinate + 1]:
-                        self.boxes[rowCoordinate][columnCoordinate + 1].set_value(0)
-                        zeroBoard[rowCoordinate][columnCoordinate + 1] = False
-                        check_right(board, rowCoordinate, columnCoordinate + 1)
-                        check_up(board, rowCoordinate, columnCoordinate + 1)
-                        check_down(board, rowCoordinate, columnCoordinate + 1)
-                    elif columnCoordinate != columns - 1:
-                        self.boxes[rowCoordinate][columnCoordinate].set_value(
-                            self.true_board[rowCoordinate][columnCoordinate])
+                    def check_left(board, rowCoordinate, columnCoordinate):
+                        if columnCoordinate != 0 and solvedBoard[rowCoordinate][columnCoordinate - 1] == 0 and \
+                                zeroBoard[rowCoordinate][
+                                    columnCoordinate - 1]:
+                            self.boxes[rowCoordinate][columnCoordinate - 1].set_value(0)
+                            zeroBoard[rowCoordinate][columnCoordinate - 1] = False
+                            check_left(board, rowCoordinate, columnCoordinate - 1)
+                            check_up(board, rowCoordinate, columnCoordinate - 1)
+                            check_down(board, rowCoordinate, columnCoordinate - 1)
+                            '''elif columnCoordinate != 0:
+                            self.boxes[rowCoordinate][columnCoordinate - 1].set_value(
+                                self.true_board[rowCoordinate][columnCoordinate - 1])'''
 
-                def check_left(board, rowCoordinate, columnCoordinate):
-                    if columnCoordinate != 0 and solvedBoard[rowCoordinate][columnCoordinate - 1] == 0 and \
-                            zeroBoard[rowCoordinate][
-                                columnCoordinate - 1]:
-                        self.boxes[rowCoordinate][columnCoordinate - 1].set_value(0)
-                        zeroBoard[rowCoordinate][columnCoordinate - 1] = False
-                        check_left(board, rowCoordinate, columnCoordinate - 1)
-                        check_up(board, rowCoordinate, columnCoordinate - 1)
-                        check_down(board, rowCoordinate, columnCoordinate - 1)
-                    elif columnCoordinate != 0:
-                        self.boxes[rowCoordinate][columnCoordinate].set_value(
-                            self.true_board[rowCoordinate][columnCoordinate])
+                    def check_up(board, rowCoordinate, columnCoordinate):
+                        if rowCoordinate != 0 and solvedBoard[rowCoordinate - 1][columnCoordinate] == 0 and \
+                                zeroBoard[rowCoordinate - 1][columnCoordinate]:
+                            self.boxes[rowCoordinate - 1][columnCoordinate].set_value(0)
+                            zeroBoard[rowCoordinate - 1][columnCoordinate] = False
+                            check_right(board, rowCoordinate - 1, columnCoordinate)
+                            check_left(board, rowCoordinate - 1, columnCoordinate)
+                            check_up(board, rowCoordinate + 1, columnCoordinate)
+                            '''elif rowCoordinate != 0:
+                            self.boxes[rowCoordinate - 1][columnCoordinate].set_value(
+                                self.true_board[rowCoordinate - 1][columnCoordinate])'''
 
-                def check_up(board, rowCoordinate, columnCoordinate):
-                    if rowCoordinate != 0 and solvedBoard[rowCoordinate - 1][columnCoordinate] == 0 and \
-                            zeroBoard[rowCoordinate - 1][columnCoordinate]:
-                        self.boxes[rowCoordinate - 1][columnCoordinate].set_value(0)
-                        zeroBoard[rowCoordinate - 1][columnCoordinate] = False
-                        check_right(board, rowCoordinate - 1, columnCoordinate)
-                        check_left(board, rowCoordinate - 1, columnCoordinate)
-                        check_up(board, rowCoordinate + 1, columnCoordinate)
-                    elif rowCoordinate != 0:
-                        self.boxes[rowCoordinate][columnCoordinate].set_value(
-                            self.true_board[rowCoordinate][columnCoordinate])
+                    def check_down(board, rowCoordinate, columnCoordinate):
+                        if rowCoordinate != rows - 1 and solvedBoard[rowCoordinate + 1][columnCoordinate] == 0 and \
+                                zeroBoard[rowCoordinate + 1][columnCoordinate]:
+                            self.boxes[rowCoordinate + 1][columnCoordinate].set_value(0)
+                            zeroBoard[rowCoordinate + 1][columnCoordinate] = False
+                            check_right(board, rowCoordinate + 1, columnCoordinate)
+                            check_left(board, rowCoordinate + 1, columnCoordinate)
+                            check_down(board, rowCoordinate - 1, columnCoordinate)
+                            '''elif rowCoordinate != rows - 1:
+                            self.boxes[rowCoordinate + 1][columnCoordinate].set_value(
+                                self.true_board[rowCoordinate + 1][columnCoordinate])'''
 
-                def check_down(board, rowCoordinate, columnCoordinate):
-                    if rowCoordinate != rows - 1 and solvedBoard[rowCoordinate + 1][columnCoordinate] == 0 and \
-                            zeroBoard[rowCoordinate + 1][columnCoordinate]:
-                        self.boxes[rowCoordinate + 1][columnCoordinate].set_value(0)
-                        zeroBoard[rowCoordinate + 1][columnCoordinate] = False
-                        check_right(board, rowCoordinate + 1, columnCoordinate)
-                        check_left(board, rowCoordinate + 1, columnCoordinate)
-                        check_down(board, rowCoordinate - 1, columnCoordinate)
-                    elif rowCoordinate != rows - 1:
-                        self.boxes[rowCoordinate][columnCoordinate].set_value(
-                            self.true_board[rowCoordinate][columnCoordinate])
+                    check_right(board, rowCoordinate, columnCoordinate)
+                    check_left(board, rowCoordinate, columnCoordinate)
+                    check_down(board, rowCoordinate, columnCoordinate)
+                    check_up(board, rowCoordinate, columnCoordinate)
+                if True:
+                    def first_edge_zero():
+                        self.update_model()
+                        for i in range(rowsNum):
+                            for j in range(columnsNum):
+                                if self.boxes[i][j].value == 0 and not is_edge(board, i, j) and has_zero_edge():
+                                    return i, j
 
-                check_right(board, rowCoordinate, columnCoordinate)
-                check_left(board, rowCoordinate, columnCoordinate)
-                check_down(board, rowCoordinate, columnCoordinate)
-                check_up(board, rowCoordinate, columnCoordinate)
+                    def move_edge_zero(rowCoordinate, columnCoordinate):
+                        reveal_surroundings(rowCoordinate, columnCoordinate)
+                        zeroBoard[rowCoordinate][columnCoordinate] = False
+                        if rowCoordinate != 0:
+                            if self.boxes[rowCoordinate - 1][
+                                columnCoordinate].value == 0:  # and not is_edge(board, rowCoordinate - 1, columnCoordinate):
+                                if zeroBoard[rowCoordinate - 1][columnCoordinate]:
+                                    reveal_surroundings(rowCoordinate - 1, columnCoordinate)
+                                    zeroBoard[rowCoordinate - 1][columnCoordinate] = False
+                                    move_edge_zero(rowCoordinate - 1, columnCoordinate)
+
+                        if columnCoordinate != columns - 1:
+                            if self.boxes[rowCoordinate][columnCoordinate + 1].value == 0:
+                                if zeroBoard[rowCoordinate][
+                                    columnCoordinate + 1]:  # and not is_edge(board, rowCoordinate, columnCoordinate + 1):
+                                    reveal_surroundings(rowCoordinate, columnCoordinate + 1)
+                                    zeroBoard[rowCoordinate][columnCoordinate + 1] = False
+                                    move_edge_zero(rowCoordinate, columnCoordinate + 1)
+
+                        if rowCoordinate != rows - 1:
+                            if self.boxes[rowCoordinate + 1][
+                                columnCoordinate].value == 0:  # and not is_edge(board, rowCoordinate + 1, columnCoordinate):
+                                if zeroBoard[rowCoordinate + 1][columnCoordinate]:
+                                    reveal_surroundings(rowCoordinate + 1, columnCoordinate)
+                                    zeroBoard[rowCoordinate + 1][columnCoordinate] = False
+                                    move_edge_zero(rowCoordinate + 1, columnCoordinate)
+
+                        if columnCoordinate != 0:
+                            if self.boxes[rowCoordinate][
+                                columnCoordinate - 1].value == 0:  # and not is_edge(board, rowCoordinate, columnCoordinate - 1):
+                                if zeroBoard[rowCoordinate][columnCoordinate - 1]:
+                                    reveal_surroundings(rowCoordinate, columnCoordinate - 1)
+                                    zeroBoard[rowCoordinate][columnCoordinate - 1] = False
+                                    move_edge_zero(rowCoordinate, columnCoordinate - 1)
+
+                    def reveal_surroundings(rowCoordinate, columnCoordinate):
+                        if rowCoordinate != 0 and columnCoordinate != 0:
+                            # if self.boxes[rowCoordinate - 1][columnCoordinate - 1].value == 9:
+                            self.boxes[rowCoordinate - 1][columnCoordinate - 1].set_value(
+                                self.true_board[rowCoordinate - 1][columnCoordinate - 1])
+
+                        if rowCoordinate != 0:
+                            # if self.boxes[rowCoordinate - 1][columnCoordinate].value == 9:
+                            self.boxes[rowCoordinate - 1][columnCoordinate].set_value(
+                                self.true_board[rowCoordinate - 1][columnCoordinate])
+
+                        if rowCoordinate != 0 and columnCoordinate != columns - 1:
+                            # if self.boxes[rowCoordinate - 1][columnCoordinate + 1].value == 9:
+                            self.boxes[rowCoordinate - 1][columnCoordinate + 1].set_value(
+                                self.true_board[rowCoordinate - 1][columnCoordinate + 1])
+
+                        if columnCoordinate != 0:
+                            # if self.boxes[rowCoordinate][columnCoordinate - 1].value == 9:
+                            self.boxes[rowCoordinate][columnCoordinate - 1].set_value(
+                                self.true_board[rowCoordinate][columnCoordinate - 1])
+
+                        if columnCoordinate != columns - 1:
+                            # if self.boxes[rowCoordinate][columnCoordinate + 1].value == 9:
+                            self.boxes[rowCoordinate][columnCoordinate + 1].set_value(
+                                self.true_board[rowCoordinate][columnCoordinate + 1])
+
+                        if rowCoordinate != rows - 1 and columnCoordinate != 0:
+                            # if self.boxes[rowCoordinate + 1][columnCoordinate - 1].value == 9:
+                            self.boxes[rowCoordinate + 1][columnCoordinate - 1].set_value(
+                                self.true_board[rowCoordinate + 1][columnCoordinate - 1])
+
+                        if rowCoordinate != rows - 1:
+                            # if self.boxes[rowCoordinate + 1][columnCoordinate].value == 9:
+                            self.boxes[rowCoordinate + 1][columnCoordinate].set_value(
+                                self.true_board[rowCoordinate + 1][columnCoordinate])
+
+                        if rowCoordinate != rows - 1 and columnCoordinate != columns - 1:
+                            # if self.boxes[rowCoordinate + 1][columnCoordinate + 1].value == 9:
+                            self.boxes[rowCoordinate + 1][columnCoordinate + 1].set_value(
+                                self.true_board[rowCoordinate + 1][columnCoordinate + 1])
+
+                    def reset_checked_board():
+                        self.update_model()
+                        for i in range(len(board)):
+                            for j in range(len(board[0])):
+                                if self.boxes[i][j].value == 0 and not is_edge(board, i, j):
+                                    zeroBoard[i][j] = True
+                                else:
+                                    zeroBoard[i][j] = False
+                        return zeroBoard
+
+                    self.update_model()
+                    zeroBoard = reset_checked_board()
+                    row, column = first_edge_zero()
+                    reveal_surroundings(row, column)
+                    zeroBoard[row][column] = False
+                    self.update_model()
+                    move_edge_zero(row, column)
             return True
         else:
             return False
@@ -182,8 +282,21 @@ class Box:
             text = font.render(str(self.value), 1, numberColor)
             window.blit(text, (x + (boxWidth / 2 - text.get_width() / 2), y + (boxWidth / 2 - text.get_width() / 2)))
 
+        if self.selected:
+            self.set_background_selected(window)
+
     def set_value(self, value):
         self.value = value
+
+    def set_background_selected(self, window):
+        boxWidth = self.width / columnsNum
+        x = self.columns * boxWidth
+        y = self.rows * boxWidth
+
+        pygame.draw.line(window, selectedBorderColor, (x, y), (x + boxWidth, y), 2)
+        pygame.draw.line(window, selectedBorderColor, (x, y), (x, y + boxWidth), 2)
+        pygame.draw.line(window, selectedBorderColor, (x, y + boxWidth), (x + boxWidth, y + boxWidth), 2)
+        pygame.draw.line(window, selectedBorderColor, (x + boxWidth, y), (x + boxWidth, y + boxWidth), 2)
 
 
 def redraw_window(window, board, time):
@@ -231,10 +344,13 @@ def main():
                     i, j = board.selected
                     if not board.reveal():
                         print("Game over")
-                        run = False
+                        # run = False
                     if board.completed_board():
                         print("You Win")
                         run = False
+                if event.key == pygame.K_BACKSPACE:
+                    i, j = board.selected
+                    board.boxes[i][j].value = -5
             if event.type == pygame.MOUSEBUTTONDOWN:
                 position = pygame.mouse.get_pos()
                 clicked = board.click(position)
