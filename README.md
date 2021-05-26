@@ -73,30 +73,24 @@ An interactive Sudoku GUI with built-in Python solver
    timeColor = (ENTER DECIMAL CODE HERE)
    wrongCounterColor = (ENTER DECIMAL CODE HERE)
    ```
-2. Enter your custom Sudoku Board in ```MainGUI.py```
+2. (Optional) Change the size of board and number of mines
    ```py
-   pre_board = [
-        ["ENTER ROW 1 HERE AS STRING OF 9 NUMBERS"],
-        ["ENTER ROW 2 HERE AS STRING OF 9 NUMBERS"],
-        ["ENTER ROW 3 HERE AS STRING OF 9 NUMBERS"],
-        ["ENTER ROW 4 HERE AS STRING OF 9 NUMBERS"],
-        ["ENTER ROW 5 HERE AS STRING OF 9 NUMBERS"],
-        ["ENTER ROW 6 HERE AS STRING OF 9 NUMBERS"],
-        ["ENTER ROW 7 HERE AS STRING OF 9 NUMBERS"],
-        ["ENTER ROW 8 HERE AS STRING OF 9 NUMBERS"],
-        ["ENTER ROW 9 HERE AS STRING OF 9 NUMBERS"],
-    ]
-    ```
-3. Run `MainGUI.py`: ``` python3 MainGUI.py ```
-* This will display a Sudoku Board GUI
-* Use the mouse to click and select different boxes on the board
-* Use the 1 - 9 number keys to enter a number in any unfilled box
-  * This will enter the number as a "guess"
-  * To confirm this number, select the box and press "return"/"enter"
-    * If incorrect, this will show up as an wrong X
-    * If correct, the number will fill the box and be confirmed
-* Press "delete" to clear the board
-* Press "space" to auto-solve the board with a back-tracking algorithm
+   rowsNum = ENTER NUMBER OF ROWS
+   columnsNum = ENTER NUMBER OF COLUMNS
+   minesNum = ENTER NUMBER OF MINES
+   ```
+4. Run `MainGUI.py`: ```python3 MainGUI.py```
+   * This will display a Minesweeper Board GUI
+   * Use the mouse to click and select different boxes on the board
+   * Use "return"/"enter" to reveal the selected box
+   * Use "delete"/"backspace" to mark an unrevealed box as a mine
+   * Use "k" to unmark an unreveal box as a mine
+The number code:
+   * 0-8 Num of Mines
+   * 9 Unrevealed
+   * -5 Selected
+   * -1 Mine
+   * -7 Marked as Mine
 
 
 <!-- ROADMAP -->
