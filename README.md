@@ -85,12 +85,12 @@ An interactive Sudoku GUI with built-in Python solver
    * Use "return"/"enter" to reveal the selected box
    * Use "delete"/"backspace" to mark an unrevealed box as a mine
    * Use "k" to unmark an unreveal box as a mine
-The number code:
-   * 0-8 Num of Mines
-   * 9 Unrevealed
-   * -5 Selected
-   * -1 Mine
-   * -7 Marked as Mine
+   * The number code:
+     * 0-8: Num of Mines
+     * 9: Unrevealed
+     * -5: Selected
+     * -1: Mine
+     * -7: Marked as Mine
 
 
 <!-- ROADMAP -->
