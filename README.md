@@ -31,7 +31,6 @@
 </details>
 
 
-
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 <p align="center">
@@ -133,4 +132,3 @@ Project Link: [https://github.com/rexliu3/MineSweeper](https://github.com/rexliu
 [license-url]: https://github.com/rexliu3/MineSweeper/blob/master/LICENSE.txt
 [linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=for-the-badge&logo=linkedin&colorB=555
 [linkedin-url]: https://linkedin.com/in/rexliu3 
-
