@@ -36,10 +36,9 @@
 <p align="center">
   <img width="400" height="300" src="images/screenshot.png">
 </p>
-An interactive Sudoku GUI with built-in Python solver
-* Playable Sudoku game GUI
-* Sudoku board solver to visualize backtracking algorithm
-* Features timer and incorrect move counter
+
+Playable Minesweeper game GUI with Minesweeper board generator based on difficultly. Users can flag and reveal boxes.
+
 
 ### Built With
 * [Python](https://www.python.org/)
